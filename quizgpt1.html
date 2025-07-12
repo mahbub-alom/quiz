@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Puzzle Quiz UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .quiz-container {
+      width: 750px;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      border-radius: 25px;
+      box-shadow: 0 0 30px #00f7ff;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      animation: popIn 1s ease-in-out;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .progress-bar {
+      height: 12px;
+      background: #333;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, #00f7ff, #02e0d9);
+      width: 0%;
+      transition: width 1s ease-in-out;
+    }
+    .question-box {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 25px;
+      border-radius: 18px;
+      margin-bottom: 25px;
+      border-left: 6px solid #00f7ff;
+      box-shadow: 0 0 10px rgba(0, 247, 255, 0.4);
+    }
+    .question-box h2 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .options {
+      display: grid;
+      gap: 15px;
+      position: relative;
+    }
+    .option {
+      background: #2a2a2a;
+      padding: 18px;
+      border-radius: 14px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .option:hover {
+      background: #00f7ff;
+      color: #000;
+      transform: scale(1.06);
+    }
+    .buttons {
+      margin-top: 25px;
+      display: flex;
+      justify-content: space-between;
+    }
+    button {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #00f7ff, #02e0d9);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    button:hover {
+      transform: scale(1.08);
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .svg-shape {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      opacity: 0.1;
+      z-index: 0;
+    }
+    .svg-shape2 {
+      position: absolute;
+      bottom: -30px;
+      left: -30px;
+      opacity: 0.05;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <svg class="svg-shape" width="180" height="180" viewBox="0 0 100 100">
+      <path d="M10 0 H90 V40 Q80 50 90 60 V100 H10 V60 Q20 50 10 40 Z" fill="#00f7ff" />
+    </svg>
+    <svg class="svg-shape2" width="200" height="200" viewBox="0 0 100 100">
+      <path d="M0 10 V90 H40 Q50 80 60 90 H100 V10 H60 Q50 20 40 10 Z" fill="#ffffff" />
+    </svg>
+
+    <div class="top-bar">
+      <div>🧠 Score: <span id="score">0</span></div>
+      <div>⏳ Time Left: <span id="timer">30</span>s</div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <div class="question-box">
+      <h2>🧩 Question 4 of 10</h2>
+      <p>What is the area of a square with side length 3?</p>
+    </div>
+
+    <div class="options">
+      <div class="option" onclick="selectAnswer(this, false)">A) 14</div>
+      <div class="option" onclick="selectAnswer(this, false)">B) 12</div>
+      <div class="option" onclick="selectAnswer(this, false)">C) 8</div>
+      <div class="option" onclick="selectAnswer(this, true)">D) 9</div>
+    </div>
+
+    <div class="buttons">
+      <button disabled>⏪ Previous</button>
+      <button onclick="nextQuestion()">Next ⏩</button>
+    </div>
+  </div>
+
+  <script>
+    let score = 0;
+    let timeLeft = 30;
+    const scoreEl = document.getElementById('score');
+    const timerEl = document.getElementById('timer');
+    const progressEl = document.getElementById('progress');
+
+    const timer = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        alert("⏰ Time's up! Final Score: " + score);
+      } else {
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+        progressEl.style.width = `${(30 - timeLeft) / 30 * 100}%`;
+      }
+    }, 1000);
+
+    function selectAnswer(el, isCorrect) {
+      document.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
+      el.style.border = '2px solid ' + (isCorrect ? 'lime' : 'red');
+      if (isCorrect) {
+        score += 10;
+        scoreEl.textContent = score;
+      }
+    }
+
+    function nextQuestion() {
+      alert('Next question logic goes here.');
+    }
+  </script>
+</body>
+</html>
